@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   
+    <title>مهامي</title>
+    <style>
+        /* ===== Layout ===== */
+        body {
+            background-color: rgb(54, 6, 99);
+            height: 100vh;
+            margin: 0;
+        }
+
+        #container {
+            background-color: #faebd7;
+            width: 70%;
+            margin: 80px auto;
+        }
+
+        /* ===== Header ===== */
+        #container-head {
+            background-color: rgb(115, 64, 162);
+            text-align: center;
+            width: 100%;
+            height: 55px;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        #container-head h1 {
+            color: white;
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        #add-btn {
+            position: absolute;
+            right: 5px;
+            color: #faebd7;
+            background-color: rgb(23, 6, 39);
+        }
+
+        /* ===== Todos Container ===== */
+        #todos-container {
+            background-color: #faebd7;
+            padding: 10px;
+            border: 2px solid black;
+            height: auto;
+            direction: rtl;
+        }
+
+        /* ===== Todo Item ===== */
+        .task {
+            background-color: rgb(219, 213, 204);
+            width: 90%;
+            margin: auto;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 2px solid black;
+            transition: box-shadow 0.1s ease-in-out;
+        }
+
+        .task:hover {
+            box-shadow: 2px 2px 10px rgb(165, 80, 171);
+        }
+
+        .done {
+            background-color: rgb(103, 241, 73);
+         }
+
+        #info-container {
+            width: 70%;
+            direction: rtl;
+            margin-right: 5px;
+        }
+
+        /* ===== Buttons ===== */
+        .btn-container {
+            width: 20%;
+            height: 100%;
+            margin: auto;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        #container button {
+            font-size: 25px;
+            border-radius: 50%;
+            border: none;
+            padding: 10px;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: border-radius 0.1s;
+        }
+
+        #container button:hover {
+            border: solid 2px black;
+            border-radius: 20%;
+        }
+    
+
+        .btn-edit   { background-color: rgb(96, 106, 151); }
+        .btn-done   { background-color: rgb(43, 219, 33); }
+        .btn-delete { background-color: rgb(162, 34, 34); }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="container-head">
+            <h1>مهامي</h1>
+            <button id="add-btn" class="btn-edit">+</button>
+        </div>
+        <div id="todos-container">
+            <!-- <div class="class">
+                <div class="btn-container">
+                    <button  class="btn-edit">e</button>
+                    <button class="btn-done">n</button>
+                    <button class="btn-delete">d</button>
+                </div>
+                <div class="info-container">
+                    <h1>title</h1>
+                    <p>date</p>
+                </div>
+            </div> -->
+        </div>
+    </div>
+</body>
+
+<script>
+        // /* ===== Element References ===== */
+        const addBtn = document.getElementById('add-btn');
+        const todosContainer = document.getElementById('todos-container');
+        const mainContainer = document.getElementById('container');
+
+        let tasks = [
+            {// will be deleted later: 
+                "title": "start building",
+                "date": '١/١/١٤٤٨ ه',
+                "isDone": false
+            }
+        ]
+        getStoredtasks()  // later, tasks = retrivedData or tasks = []
+    
+        function fillTasksOnThePage(){ 
+            todosContainer.innerHTML = `<h2 id="info-message" style="text-align: center; font-size:15px;">نظم وقتك!</h2>`
+            let index = 0
+            for (task of tasks){
+                let content =
+                `
+                <div class="task ${task.isDone?'done':''}" >
+                   
+                    <! -- TASKS INFO --> 
+                    <div id="info-container">
+                        <h2>${task.title}</h2>
+                        <span>${task.date}</span>
+                    </div>    
+                    <!--// TASKS INFO //-->
+
+                    <! -- TASKS ACTIONS -->
+                    <div class="btn-container"> 
+                        <button onclick="deleteTask(${index})"  class = "btn-delete" style="background-color: rgb (114, 0, 0); color: white">🗑️</button> 
+                        
+                        ${task.isDone?`
+                        <button onclick="completeTask(${index})"  class = "btn-done"style="background-color: rgb(118, 0, 103); color: white">تمت</button>
+                        `:`
+                        <button onclick="completeTask(${index})" class = "btn-done" style="background-color: rgb(0, 150, 30); color: white">✔️</button>
+                        `}
+                        
+                        <button onclick="editTask(${index})" class = "btn-edit" style="background-color: rgba(0, 16, 197, 0.692);">✎</button>
+                    </div>
+                    <!--// TASKS ACTIONS //-->
+
+                </div>
+                `
+                todosContainer.innerHTML += content
+                index++          
+            }
+        }
+        fillTasksOnThePage()
+
+        function todayDateAR(){
+            const today = new Date();
+            const hijriDate = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            }).format(today);
+            return hijriDate
+        }    
+        
+        addBtn.addEventListener('click', () => {
+            let today = todayDateAR()
+            let taskName = prompt("enter task name:")
+            
+            if (taskName ===null || taskName ===''){
+               if (taskName===''){
+                    alert("nothing enter")
+                    return null
+                }
+                return null
+            }
+            else{
+                let taskObj= {
+                    "title": taskName,
+                    "date": today+" 📆",
+                    "isDone": false
+                }
+                tasks.push(taskObj)
+                storeTasksLocally()
+                fillTasksOnThePage()
+            } 
+        })
+
+        function deleteTask(index){
+            let task = tasks[index]
+            let isConfirmed = confirm("Sure? "+task.title)
+            if (isConfirmed){
+                tasks.splice(index,1)
+                storeTasksLocally()
+                fillTasksOnThePage()
+            }
+        }
+    
+        function editTask(index){
+            let task = tasks[index]
+            let newTaskTitle = prompt("new title again?", task.title)
+            if (newTaskTitle === null) {
+                alert('لقد الغيت الاضافة!');
+                task.title = task.title
+            }
+            else if (newTaskTitle.trim() === '') {
+                alert('لقد ادخلت شيء فارغ!');
+                task.title = task.title
+            }
+            else{
+                task.title = newTaskTitle
+                
+            }
+
+            storeTasksLocally()
+            fillTasksOnThePage()
+        }
+        
+        function completeTask(index){
+            let task = tasks[index]
+            task.isDone = !task.isDone
+            storeTasksLocally()
+            fillTasksOnThePage()
+        }
+
+        function storeTasksLocally(){
+            let tasksInString =  JSON.stringify(tasks)
+            localStorage.setItem("myTasks", tasksInString)
+        }
+
+        function getStoredtasks(){
+            let retrivedData = JSON.parse(localStorage.getItem("myTasks"))
+            // tasks = retrivedData ?? [] <<< same as the if below:
+            if (retrivedData == null){
+                tasks = []
+            }
+            else {
+                tasks = retrivedData
+            }
+        }
+    </script>
+</html>
