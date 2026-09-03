@@ -131,17 +131,7 @@
             <button id="add-btn" class="btn-edit">+</button>
         </div>
         <div id="todos-container">
-            <!-- <div class="class">
-                <div class="btn-container">
-                    <button  class="btn-edit">e</button>
-                    <button class="btn-done">n</button>
-                    <button class="btn-delete">d</button>
-                </div>
-                <div class="info-container">
-                    <h1>title</h1>
-                    <p>date</p>
-                </div>
-            </div> -->
+           <!-- #info-container and .btn-container divs will be added here -->
         </div>
     </div>
 </body>
@@ -210,11 +200,11 @@
         
         addBtn.addEventListener('click', () => {
             let today = todayDateAR()
-            let taskName = prompt("enter task name:")
+            let taskName = prompt("ادخل عنوان المهمة")
             
             if (taskName ===null || taskName ===''){
                if (taskName===''){
-                    alert("nothing enter")
+                    alert("لا شيء")
                     return null
                 }
                 return null
@@ -233,7 +223,7 @@
 
         function deleteTask(index){
             let task = tasks[index]
-            let isConfirmed = confirm("Sure? "+task.title)
+            let isConfirmed = confirm("متاكد من الحذف؟ "+task.title)
             if (isConfirmed){
                 tasks.splice(index,1)
                 storeTasksLocally()
@@ -243,9 +233,8 @@
     
         function editTask(index){
             let task = tasks[index]
-            let newTaskTitle = prompt("new title again?", task.title)
+            let newTaskTitle = prompt("عنوانك الجديد؟", task.title)
             if (newTaskTitle === null) {
-                alert('لقد الغيت الاضافة!');
                 task.title = task.title
             }
             else if (newTaskTitle.trim() === '') {
@@ -254,7 +243,6 @@
             }
             else{
                 task.title = newTaskTitle
-                
             }
 
             storeTasksLocally()
@@ -275,13 +263,13 @@
 
         function getStoredtasks(){
             let retrivedData = JSON.parse(localStorage.getItem("myTasks"))
-            // tasks = retrivedData ?? [] <<< same as the if below:
-            if (retrivedData == null){
-                tasks = []
-            }
-            else {
-                tasks = retrivedData
-            }
+            tasks = retrivedData ?? [] // <<< same as the if below:
+            // if (retrivedData == null){
+            //     tasks = []
+            // }
+            // else {
+            //     tasks = retrivedData
+            // }
         }
     </script>
 </html>
